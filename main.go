@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 )
 
 var Version string
+var path string
 
 func main() {
 	err := run()
@@ -30,9 +32,13 @@ func run() error {
 			return fmt.Errorf("read failed: %w", err)
 		}
 		text = strings.ReplaceAll(text, "\n", "")
+		text = strings.ReplaceAll(text, "\r", "")
 	} else {
 		text = os.Args[1]
 	}
+
+	path = filepath.Dir(os.Args[0])
+	path += "/countdown.txt"
 
 	var countdown time.Time
 
@@ -42,7 +48,7 @@ func run() error {
 	}
 	countdown = time.Now().Add(time.Duration(val) * time.Minute)
 
-	fmt.Printf("countdown v%s counting down %d minutes\n", Version, val)
+	fmt.Printf("countdown v%s counting down %d minutes, writing to %s\n", Version, val, path)
 	err = update(countdown)
 	if err != nil {
 		return fmt.Errorf("update: %w", err)
@@ -59,7 +65,7 @@ func run() error {
 }
 
 func update(countdown time.Time) error {
-	w, err := os.Create("timer.txt")
+	w, err := os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -73,17 +79,21 @@ func update(countdown time.Time) error {
 		os.Exit(0)
 	}
 	total := int(time.Until(countdown).Seconds())
+	hours := int(total/60/60) % 60
 	minutes := int(total/60) % 60
 	seconds := int(total % 60)
 
 	display := fmt.Sprintf("%d", seconds)
-	if minutes >= 1.0 {
-		display = fmt.Sprintf("%d:%d", minutes, seconds)
+	if minutes >= 1 {
+		display = fmt.Sprintf("%d:%02d", minutes, seconds)
+	}
+	if hours >= 1 {
+		display = fmt.Sprintf("%d:%02d:%02d", hours, minutes, seconds)
 	}
 	_, err = w.WriteString(display)
 	if err != nil {
 		return fmt.Errorf("write %s: %w", display, err)
 	}
-	fmt.Println("updated timer.txt:", display)
+	fmt.Println("updated countdown.txt:", display)
 	return nil
 }
