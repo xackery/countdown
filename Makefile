@@ -1,5 +1,6 @@
+VERSION = 1.0.0
 build:
 	@mkdir -p bin
-	@GOOS=darwin go build -o bin/countdown-osx
-	@GOOS=linux go build -o bin/countdown-linux
-	@GOOS=windows go build -o bin/countdown.exe
+	@GOOS=darwin go build -ldflags="-X 'main.Version=${VERSION}'" -o bin/countdown-osx
+	@GOOS=linux go build -ldflags="-X 'main.Version=${VERSION}'" -o bin/countdown-linux
+	@GOOS=windows go build -ldflags="-X 'main.Version=${VERSION}'" -o bin/countdown.exe

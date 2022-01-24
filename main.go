@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
 )
+
+var Version string
 
 func main() {
 	err := run()
@@ -17,19 +20,28 @@ func main() {
 
 func run() error {
 	var err error
-	args := os.Args
-	if len(args) < 2 {
+	text := ""
+	if len(os.Args) < 2 {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter minutes for countdown: ")
+		text, err = reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("read failed: %w", err)
+		}
 		return fmt.Errorf("usage: countdown [minutes]")
+	} else {
+		text = os.Args[1]
 	}
 
 	var countdown time.Time
 
-	val, err := strconv.Atoi(args[1])
+	val, err := strconv.Atoi(text)
 	if err != nil {
-		return fmt.Errorf("atoi %s: %w", args[1], err)
+		return fmt.Errorf("atoi %s: %w", text, err)
 	}
 	countdown = time.Now().Add(time.Duration(val) * time.Minute)
 
+	fmt.Printf("countdown v%s counting down %d minutes\n", Version, val)
 	err = update(countdown)
 	if err != nil {
 		return fmt.Errorf("update: %w", err)
@@ -63,16 +75,14 @@ func update(countdown time.Time) error {
 	minutes := int(total/60) % 60
 	seconds := int(total % 60)
 
+	display := fmt.Sprintf("%d", seconds)
 	if minutes >= 1.0 {
-		_, err = w.WriteString(fmt.Sprintf("%d:%d", minutes, seconds))
-		if err != nil {
-			return fmt.Errorf("write minutes: %w", err)
-		}
-		return nil
+		display = fmt.Sprintf("%d:%d", minutes, seconds)
 	}
-	_, err = w.WriteString(fmt.Sprintf("%d", seconds))
+	_, err = w.WriteString(display)
 	if err != nil {
-		return fmt.Errorf("write seconds: %w", err)
+		return fmt.Errorf("write %s: %w", display, err)
 	}
+	fmt.Println("updated timer.txt:", display)
 	return nil
 }
