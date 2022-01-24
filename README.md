@@ -1,9 +1,10 @@
 # countdown
-Countdown timer for OBS
+Countdown timer for OBS. It will count down until zero and end with "Starting Now"
 
 # Usage
-- Download for your OS from [releases](github.com/xackery/countdown/releases/).
-- Extract to any place you like
-- Double click the program, answer prompt on minutes for countdown.
-- Direct OBS Text GDI to timer.txt in same path
-- Profit
+- Download in [releases](https://github.com/xackery/countdown/releases).
+- Double click countdown, answer prompt on minutes for countdown.
+- Add in OBS a new Text source, target the file timer.txt made in same path
+- Profit.
+
+
