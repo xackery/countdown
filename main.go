@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -28,7 +29,7 @@ func run() error {
 		if err != nil {
 			return fmt.Errorf("read failed: %w", err)
 		}
-		return fmt.Errorf("usage: countdown [minutes]")
+		text = strings.ReplaceAll(text, "\n", "")
 	} else {
 		text = os.Args[1]
 	}
